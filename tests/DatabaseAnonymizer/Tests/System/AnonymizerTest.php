@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WebnetFr\DatabaseAnonymizer\Tests\System;
 
 use Faker\Factory as FakerFactory;
@@ -18,7 +20,7 @@ class AnonymizerTest extends TestCase
 
     /**
      * @inheritdoc
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function setUp(): void
     {
@@ -26,38 +28,39 @@ class AnonymizerTest extends TestCase
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function testAnonymizeUserTable()
+    public function testAnonymizeUserTable(): void
     {
-        $faker = FakerFactory::create();
+        $faker          = FakerFactory::create();
         $targetFields[] = new TargetField('firstname', new FakerGenerator($faker, 'firstName'));
         $targetFields[] = new TargetField('lastname', new FakerGenerator($faker, 'lastName'));
         $targetFields[] = new TargetField('birthdate', new FakerGenerator($faker, 'dateTime', [], ['date_format' => 'Y-m-d H:i:s']));
         $targetFields[] = new TargetField('phone', new FakerGenerator($faker, 'e164PhoneNumber'));
-        $targets[] = new TargetTable('users', ['id'], $targetFields, false);
+        $targets[]      = new TargetTable('users', ['id'], $targetFields, false);
 
         $connection = $this->getConnection();
         $anonymizer = new Anonymizer();
         $anonymizer->anonymize($connection, $targets);
 
         $selectSQL = $connection->createQueryBuilder()
-            ->select('u.firstname, u.lastname, u.birthdate, u.phone')
-            ->from('users', 'u')
-            ->getSQL();
+                                ->select('u.firstname, u.lastname, u.birthdate, u.phone')
+                                ->from('users', 'u')
+                                ->getSQL();
 
         $selectStmt = $connection->prepare($selectSQL);
-        $selectStmt->execute();
+        $result     = $selectStmt->executeQuery();
 
-        while ($row = $selectStmt->fetch()) {
-            $this->assertTrue(is_string($row['firstname']));
-            $this->assertTrue(is_string($row['lastname']));
-            $this->assertTrue(is_string($row['birthdate']));
-            $this->assertTrue(is_string($row['phone']));
+        while ($row = $result->fetchAssociative()) {
+            self::assertTrue(is_string($row['firstname']));
+            self::assertTrue(is_string($row['lastname']));
+            self::assertTrue(is_string($row['birthdate']));
+            self::assertTrue(is_string($row['phone']));
         }
     }
 
-    public function testTruncate()
+    public function testTruncate(): void
     {
         $targets = [
             new TargetTable('users', [], [], true),
@@ -69,31 +72,28 @@ class AnonymizerTest extends TestCase
         $anonymizer = new Anonymizer();
         $anonymizer->anonymize($connection, $targets);
 
-        $selectSQL = $connection->createQueryBuilder()
-            ->select('COUNT(*)')
-            ->from('users', 'u')
-            ->getSQL();
+        $selectSQL  = $connection->createQueryBuilder()
+                                 ->select('COUNT(*) AS count')
+                                 ->from('users', 'u')
+                                 ->getSQL();
         $selectStmt = $connection->prepare($selectSQL);
-        $selectStmt->execute();
-        $result = $selectStmt->fetch();
-        $this->assertEquals(0, current($result));
+        $result     = $selectStmt->executeQuery();
+        self::assertEquals(0, $result->fetchAssociative()['count']);
 
-        $selectSQL = $connection->createQueryBuilder()
-            ->select('COUNT(*)')
-            ->from('orders', 'o')
-            ->getSQL();
+        $selectSQL  = $connection->createQueryBuilder()
+                                 ->select('COUNT(*) AS count')
+                                 ->from('orders', 'o')
+                                 ->getSQL();
         $selectStmt = $connection->prepare($selectSQL);
-        $selectStmt->execute();
-        $result = $selectStmt->fetch();
-        $this->assertEquals(0, current($result));
+        $result     = $selectStmt->executeQuery();
+        self::assertEquals(0, $result->fetchAssociative()['count']);
 
-        $selectSQL = $connection->createQueryBuilder()
-            ->select('COUNT(*)')
-            ->from('productivity', 'p')
-            ->getSQL();
+        $selectSQL  = $connection->createQueryBuilder()
+                                 ->select('COUNT(*) AS count')
+                                 ->from('productivity', 'p')
+                                 ->getSQL();
         $selectStmt = $connection->prepare($selectSQL);
-        $selectStmt->execute();
-        $result = $selectStmt->fetch();
-        $this->assertEquals(0, current($result));
+        $result     = $selectStmt->executeQuery();
+        self::assertEquals(0, $result->fetchAssociative()['count']);
     }
 }

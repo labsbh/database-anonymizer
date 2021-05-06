@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DatabaseAnonymizer\Tests\Unit\Generator;
 
 use Faker\Factory;
@@ -11,20 +13,20 @@ use WebnetFr\DatabaseAnonymizer\Generator\FakerGenerator;
  */
 class FakerTest extends TestCase
 {
-    public function testFakerGenerators()
+    public function testFakerGenerators(): void
     {
-        $this->assertEquals(4, $this->generateValue(['formatter' => 'randomDigit', 'seed' => 'seed']));
-        $this->assertEquals(5, $this->generateValue(['formatter' => 'randomDigitNotNull', 'seed' => 'seed']));
-        $this->assertEquals(44886, $this->generateValue(['formatter' => 'randomNumber', 'arguments' => [5], 'seed' => 'seed']));
-        $this->assertEquals(8.977, $this->generateValue(['formatter' => 'randomFloat', 'arguments' => [3, 0, 20], 'seed' => 'seed']));
-        $this->assertEquals(9528, $this->generateValue(['formatter' => 'numberBetween', 'arguments' => [1000, 20000], 'seed' => 'seed']));
-        $this->assertEquals('l', $this->generateValue(['formatter' => 'randomLetter', 'arguments' => [0, 20000], 'seed' => 'seed']));
-        $this->assertEquals(['b'], $this->generateValue(['formatter' => 'randomElements', 'arguments' => [['a', 'b', 'c'], 1], 'seed' => 'seed']));
-        $this->assertEquals('b', $this->generateValue(['formatter' => 'randomElement', 'arguments' => [['a', 'b', 'c']], 'seed' => 'seed']));
-        $this->assertEquals('ducimus', $this->generateValue(['formatter' => 'word', 'seed' => 'seed']));
-        $this->assertEquals('Dr.', $this->generateValue(['formatter' => 'title', 'seed' => 'seed']));
-        $this->assertEquals('South', $this->generateValue(['formatter' => 'cityPrefix', 'seed' => 'seed']));
-        $this->assertEquals('1-671-685-8472', $this->generateValue(['formatter' => 'phoneNumber', 'seed' => 'seed']));
+        self::assertEquals(4, $this->generateValue(['formatter' => 'randomDigit', 'seed' => 'seed']));
+        self::assertEquals(5, $this->generateValue(['formatter' => 'randomDigitNotNull', 'seed' => 'seed']));
+        self::assertEquals(44886, $this->generateValue(['formatter' => 'randomNumber', 'arguments' => [5], 'seed' => 'seed']));
+        self::assertEquals(8.977, $this->generateValue(['formatter' => 'randomFloat', 'arguments' => [3, 0, 20], 'seed' => 'seed']));
+        self::assertEquals(9528, $this->generateValue(['formatter' => 'numberBetween', 'arguments' => [1000, 20000], 'seed' => 'seed']));
+        self::assertEquals('l', $this->generateValue(['formatter' => 'randomLetter', 'arguments' => [0, 20000], 'seed' => 'seed']));
+        self::assertEquals(['b'], $this->generateValue(['formatter' => 'randomElements', 'arguments' => [['a', 'b', 'c'], 1], 'seed' => 'seed']));
+        self::assertEquals('b', $this->generateValue(['formatter' => 'randomElement', 'arguments' => [['a', 'b', 'c']], 'seed' => 'seed']));
+        self::assertEquals('ducimus', $this->generateValue(['formatter' => 'word', 'seed' => 'seed']));
+        self::assertEquals('Dr.', $this->generateValue(['formatter' => 'title', 'seed' => 'seed']));
+        self::assertEquals('South', $this->generateValue(['formatter' => 'cityPrefix', 'seed' => 'seed']));
+        self::assertEquals('+16575448831', $this->generateValue(['formatter' => 'e164PhoneNumber', 'seed' => 'seed']));
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DatabaseAnonymizer\Tests\System\Command;
 
 use PHPUnit\Framework\TestCase;
@@ -17,7 +19,7 @@ class GuessConfigCommandTest extends TestCase
 {
     use SystemTestTrait;
 
-    const EXPECTED = <<<EOF
+    public const EXPECTED = <<<EOF
 webnet_fr_database_anonymizer:
     tables:
         orders:
@@ -69,29 +71,29 @@ EOF;
 
     /**
      * @inheritdoc
-     * @throws \Doctrine\DBAL\DBALException
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->regenerateUsersOrders();
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $commandTester = $this->doExecute();
 
-        $this->assertEquals(self::EXPECTED, $commandTester->getDisplay());
+        self::assertEquals(self::EXPECTED, $commandTester->getDisplay());
     }
 
-    public function testExecuteFile()
+    public function testExecuteFile(): void
     {
         $file = sys_get_temp_dir().'/'.uniqid('', true);
 
-        $this->doExecute([
-            '--file' => $file,
-        ]);
+        $this->doExecute(
+            [
+                '--file' => $file,
+            ]);
 
-        $this->assertEquals(self::EXPECTED, file_get_contents($file));
+        self::assertEquals(self::EXPECTED, file_get_contents($file));
     }
 
     /**
@@ -99,10 +101,10 @@ EOF;
      *
      * @return CommandTester
      */
-    private function doExecute($input = [])
+    private function doExecute(array $input = []): CommandTester
     {
         $configGuesser = new ConfigGuesser();
-        $configWriter = new ConfigWriter();
+        $configWriter  = new ConfigWriter();
 
         $command = (new Application('Database anonymizer', '0.0.1'))
             ->add(new GuessConfigCommand($configGuesser, $configWriter));
@@ -111,12 +113,12 @@ EOF;
 
         $input = array_merge(
             [
-                'command' => $command->getName(),
-                '--type' => $GLOBALS['db_type'],
-                '--host' => $GLOBALS['db_host'],
-                '--port' => $GLOBALS['db_port'],
+                'command'    => $command->getName(),
+                '--type'     => $GLOBALS['db_type'],
+                '--host'     => $GLOBALS['db_host'],
+                '--port'     => $GLOBALS['db_port'],
                 '--database' => $GLOBALS['db_name'],
-                '--user' => $GLOBALS['db_username'],
+                '--user'     => $GLOBALS['db_username'],
                 '--password' => $GLOBALS['db_password'],
             ],
             $input

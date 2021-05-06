@@ -1,3 +1,5 @@
 /vendor
 composer.lock
-phpunit.local.xml
+/phpunit.local.xml
+/.phpunit.result.cache
+/phpunit.xml

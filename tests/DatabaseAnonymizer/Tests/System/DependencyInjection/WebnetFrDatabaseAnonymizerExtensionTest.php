@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DatabaseAnonymizer\Tests\System\DependencyInjection;
 
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use WebnetFr\DatabaseAnonymizer\Command\AnonymizeCommand;
 use WebnetFr\DatabaseAnonymizer\Command\GuessConfigCommand;
 use WebnetFr\DatabaseAnonymizer\ConfigGuesser\ConfigGuesser;
@@ -15,13 +16,13 @@ use WebnetFr\DatabaseAnonymizer\GeneratorFactory\FakerGeneratorFactory;
 use WebnetFr\DatabaseAnonymizer\GeneratorFactory\GeneratorFactoryInterface;
 
 /**
- * @see WebnetFrDatabaseAnonymizerExtension
+ * @see    WebnetFrDatabaseAnonymizerExtension
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
 class WebnetFrDatabaseAnonymizerExtensionTest extends AbstractExtensionTestCase
 {
-    public function testServicesLoaded()
+    public function testServicesLoaded(): void
     {
         $this->load();
 
@@ -34,10 +35,9 @@ class WebnetFrDatabaseAnonymizerExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasService(GuessConfigCommand::class);
 
         $autoconfiguredInstanceof = $this->container->getAutoconfiguredInstanceof();
-        $this->assertArrayHasKey(GeneratorFactoryInterface::class, $autoconfiguredInstanceof);
+        self::assertArrayHasKey(GeneratorFactoryInterface::class, $autoconfiguredInstanceof);
         $definition = $autoconfiguredInstanceof[GeneratorFactoryInterface::class];
-        /** @var $definition ChildDefinition */
-        $this->assertEquals(
+        self::assertEquals(
             ['database_anonymizer.generator_factory' => [[]]],
             $definition->getTags()
         );
@@ -46,7 +46,7 @@ class WebnetFrDatabaseAnonymizerExtensionTest extends AbstractExtensionTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getContainerExtensions()
+    protected function getContainerExtensions(): array
     {
         return [
             new WebnetFrDatabaseAnonymizerExtension(),

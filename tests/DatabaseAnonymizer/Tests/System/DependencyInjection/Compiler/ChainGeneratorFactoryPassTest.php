@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DatabaseAnonymizer\Tests\System\DependencyInjection\Compiler;
 
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase;
@@ -11,7 +13,7 @@ use WebnetFr\DatabaseAnonymizer\GeneratorFactory\ChainGeneratorFactory;
 use WebnetFr\DatabaseAnonymizer\GeneratorFactory\ConstantGeneratorFactory;
 
 /**
- * @see ChainGeneratorFactoryPass
+ * @see    ChainGeneratorFactoryPass
  *
  * @author Vlad Riabchenko <vriabchenko@webnet.fr>
  */
@@ -20,12 +22,12 @@ class ChainGeneratorFactoryPassTest extends AbstractCompilerPassTestCase
     /**
      * @inheritdoc
      */
-    protected function registerCompilerPass(ContainerBuilder $container)
+    protected function registerCompilerPass(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new ChainGeneratorFactoryPass());
     }
 
-    public function testPass()
+    public function testPass(): void
     {
         $collectingService = new Definition();
         $this->setDefinition(ChainGeneratorFactory::class, $collectingService);
